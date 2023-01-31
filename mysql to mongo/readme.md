@@ -17,4 +17,4 @@ python script.py --sql-host=sql.example.com --sql-user=user --sql-password=secre
   </code>
 </pre>
 
-This would run the script with sql.example.com as the hostname for the SQL database, user as the username for the SQL database, secret as the password for the SQL database, database as the name of the SQL database, mongodb://mongodb.example.com:27017/ as the URL for the MongoDB database, and mongo_database_name as the name of the MongoDB database.
+This would run the script with sql.example.com as the hostname for the SQL database, user as the username for the SQL database, secret as the password for the SQL database, database as the name of the SQL database, mongodb://mongodb.example.com:27017/ as the URL for the MongoDB database, and mongo_database_name as the name of the MongoDB database. The script would also have a timeout of 60 seconds and a limit of 1000 rows per table. Note: you will need to add the --timeout and --limit argument parsing to the code for it to work.
