@@ -37,31 +37,44 @@ tables = cursor.fetchall()
 # Loop through the tables and export the data to JSON
 for table in tables:
   table_name = table[0]
-  cursor.execute("SELECT * FROM " + table_name)
+  try:
+    cursor.execute("SELECT * FROM " + table_name)
+  
 
-  rows = cursor.fetchmany(args.limit)
-  data = []
-  while rows:
-      for row in rows:
-          # Convert Decimal to float
-          row = [float(item) if isinstance(item, Decimal) else item for item in row]
-          data.append(dict(zip(cursor.column_names, row)))
-      collection = mongodb[table_name]
-      if data:
-        if collection.count_documents({}) > 0:
-          if args.update:
-            collection.insert_many(data)
+    rows = cursor.fetchall()
+    data = []
+    while rows:
+        for row in rows:
+            # Convert Decimal to float
+            row = [float(item) if isinstance(item, Decimal) else item for item in row]
+            data.append(dict(zip(cursor.column_names, row)))
+        try:
+          collection = mongodb[table_name]
+          if data:
+            if collection.count_documents({}) > 0:
+              if args.update:
+                collection.insert_many(data)
+              else:
+
+                  print(f'Collection {table_name} already exists in the MongoDB database. Use the --update argument to update the collection.')
+                  break
+                
+            else:
+              collection.insert_many(data)
+            data = []
           else:
-            print(f'Collection {table_name} already exists in the MongoDB database. Use the --update argument to update the collection.')
-            break
-        else:
-          collection.insert_many(data)
-        data = []
-      else:
-        print(f'Table {table_name} is empty')
+            print(f'Table {table_name} is empty')
 
-      time.sleep(1)
-      rows = cursor.fetchmany(args.limit)
+          time.sleep(1)
+          rows = cursor.fetchmany(args.limit)
+        except mysql.connector.errors.InternalError as error:
+          if "Unread result found" in str(error):
+            break
+      
+  except mysql.connector.errors.InternalError as error:
+      if "Unread result found" in str(error):
+        break
+
 
 
 # Close the connections
