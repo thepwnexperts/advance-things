@@ -6,7 +6,7 @@
 mongodump --host <source_hostname>:<source_port> --db <source_database_name> --out <output_directory>
 ```
 
-# Transfer the BSON file to the destination server using a method such as scp, sftp, or other file transfer method.
+#  Transfer the BSON file to the destination server using a method such as scp, sftp, or other file transfer method.
 
 # Restore the data to the destination MongoDB Atlas cluster using the mongorestore utility. For example:
 
