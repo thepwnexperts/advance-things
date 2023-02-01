@@ -1,0 +1,16 @@
+
+# Connect to the source MongoDB database.
+
+## Dump the data from the source database to a BSON file using the mongodump utility. For example:
+```
+mongodump --host <source_hostname>:<source_port> --db <source_database_name> --out <output_directory>
+```
+
+# Transfer the BSON file to the destination server using a method such as scp, sftp, or other file transfer method.
+
+# Restore the data to the destination MongoDB Atlas cluster using the mongorestore utility. For example:
+
+```
+mongorestore --host <destination_cluster_uri> --ssl --username <destination_username> --password <destination_password> --authenticationDatabase admin --db <destination_database_name> <input_directory>/<source_database_name>
+```
+
