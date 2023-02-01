@@ -25,7 +25,7 @@ mongodump --uri mongodb://<username>:<password>@<source_hostname>:<source_port>/
 ```
 mongodump --uri mongodb://<username>:<password>@<source_hostname>:<source_port>/<source_database_name> --out <output_directory>
 ```
-
+## without ssl
 ```
 mongodump --uri "mongodb://127.0.0.1:27017/?directConnection=true&serverSelectionTimeoutMS=2000&appName=mongosh+1.6.2"  --db test --out test
 ```
