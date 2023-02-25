@@ -1,79 +1,80 @@
 #!/bin/bash
 
-# Get domain name from command line argument or prompt
-if [ -z "$1" ]
-then
-  read -p "Enter domain name: " domain
-else
-  domain=$1
+# Check if user is root
+if [ "$EUID" -ne 0 ]
+  then echo "Please run as root"
+  exit
 fi
 
-# Install Nginx and Certbot based on the distro's package manager
-if [ -f /etc/debian_version ]; then
-  sudo apt-get update
-  sudo apt-get install -y nginx certbot python3-certbot-nginx
-elif [ -f /etc/redhat-release ]; then
-  sudo yum update
-  sudo yum install -y nginx certbot python3-certbot-nginx
-elif [ -f /etc/SuSE-release ]; then
-  sudo zypper refresh
-  sudo zypper install -y nginx certbot python3-certbot-nginx
-elif [ -f /etc/arch-release ]; then
-  sudo pacman -Syu
-  sudo pacman -S --noconfirm nginx certbot python-certbot-nginx
+# Detect distro and install certbot
+if command -v apt-get >/dev/null 2>&1; then
+  apt-get update
+  apt-get install -y certbot python3-certbot-nginx
+elif command -v dnf >/dev/null 2>&1; then
+  dnf install -y certbot python3-certbot-nginx
+elif command -v yum >/dev/null 2>&1; then
+  yum install -y certbot python3-certbot-nginx
 else
-  echo "Unsupported distribution"
+  echo "Could not detect package manager. Please install certbot and python3-certbot-nginx manually."
   exit 1
 fi
 
-# Create a default Nginx page
-sudo tee /var/www/html/index.html >/dev/null <<EOF
+# Prompt user for domain name and email address
+read -p "Enter your domain name: " DOMAIN
+read -p "Enter your email address: " EMAIL
+
+# Check if nginx is installed
+if ! command -v nginx >/dev/null 2>&1; then
+  echo "nginx is not installed. Please install nginx before running this script."
+  exit 1
+fi
+
+# Create nginx server block file
+cat > /etc/nginx/sites-available/$DOMAIN << EOF
+server {
+        listen 80 ;
+        listen [::]:80 ;
+        server_name $DOMAIN ;
+        root /var/www/$DOMAIN ;
+        index index.html index.htm index.nginx-debian.html ;
+        location / {
+                try_files \$uri \$uri/ =404 ;
+        }
+}
+EOF
+
+# Create default html file for server block
+mkdir -p /var/www/$DOMAIN
+cat > /var/www/$DOMAIN/index.html << EOF
 <html>
 <head>
-  <title>Welcome to $domain!</title>
+  <title>Welcome to $DOMAIN!</title>
 </head>
 <body>
-  <h1>Success! The $domain server block is working!</h1>
+  <h1>Success! The $DOMAIN server block is working!</h1>
 </body>
 </html>
 EOF
 
-# Create a new Nginx server block configuration file for the domain
-sudo tee /etc/nginx/sites-available/$domain >/dev/null <<EOF
-server {
-  listen 80;
-  listen [::]:80;
+# Create symbolic link to enable server block
+ln -s /etc/nginx/sites-available/$DOMAIN /etc/nginx/sites-enabled/$DOMAIN
 
-  server_name $domain;
+# Test nginx configuration and reload if successful
+nginx -t && systemctl reload nginx
 
-  location / {
-    try_files \$uri \$uri/ =404;
-  }
-}
-EOF
-
-# Enable the new server block configuration if not already enabled
-if [ ! -f /etc/nginx/sites-enabled/$domain ]
-then
-  sudo ln -s /etc/nginx/sites-available/$domain /etc/nginx/sites-enabled/
-fi
-
-# Test the Nginx configuration
-sudo nginx -t
-
-# If the configuration test is successful, reload Nginx
-if [ $? -eq 0 ]
-then
-  sudo systemctl reload nginx
-fi
-
-# Obtain SSL certificate from Let's Encrypt
-if [ -z "$2" ]
-then
-  sudo certbot --nginx -d $domain
+# Allow HTTP and HTTPS traffic through firewall
+if command -v ufw >/dev/null 2>&1; then
+  ufw allow 'Nginx Full'
+elif command -v firewall-cmd >/dev/null 2>&1; then
+  firewall-cmd --add-service=http --add-service=https --permanent
+  firewall-cmd --reload
 else
-  sudo certbot --nginx -d $domain --register-unsafely-without-email
+  echo "Could not detect firewall. Please allow HTTP and HTTPS traffic manually."
 fi
 
-# Add a cronjob to auto-renew the SSL certificate
-(crontab -l 2>/dev/null; echo "0 0 * * 1 certbot renew --nginx --quiet") | crontab -
+# Run certbot to obtain SSL/TLS certificate
+certbot --nginx -d $DOMAIN -m $EMAIL --agree-tos --redirect --non-interactive
+
+# Add cronjob for automatic renewal of SSL/TLS certificate
+(crontab -l ; echo "0 12 * * * /usr/bin/certbot renew --quiet") | crontab -
+
