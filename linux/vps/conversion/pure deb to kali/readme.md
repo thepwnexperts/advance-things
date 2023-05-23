@@ -7,7 +7,6 @@ This script automates the process of converting a Debian-based system to Kali Li
 Follow these steps to use the script:
 
 1. Open a terminal on your Debian-based system.
-2. Download the script:
 
    # bash
  ```
