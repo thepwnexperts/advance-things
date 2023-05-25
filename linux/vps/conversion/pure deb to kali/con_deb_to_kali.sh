@@ -14,9 +14,6 @@ sudo apt dist-upgrade -y
 # Install packages
 sudo apt-get install -y htop bpytop neofetch
 
-# Install additional packages
-sudo apt-get install -y npm nodejs
-sudo npm install -g pm2 uuid
 
 # Download and run swap script
 wget https://raw.githubusercontent.com/thepwnexperts/advance-things/main/linux/vps/swap/swap.sh
