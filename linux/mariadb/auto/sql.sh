@@ -38,22 +38,38 @@ y
 y
 EOF
 
-# Create database and user
-sudo mysql -u root -p"$DB_PASS" <<EOF
+# Check if the user wants to change the root password
+if [[ $DB_USER == "root" ]]; then
+  # Change root password
+  sudo mysql -u root <<EOF
+ALTER USER 'root'@'localhost' IDENTIFIED BY '$DB_PASS';
+FLUSH PRIVILEGES;
+EOF
+
+  # Check for errors
+  if [ $? -ne 0 ]; then
+    echo "Error changing root password"
+    exit 1
+  else
+    echo "Root password changed successfully."
+  fi
+else
+  # Create database and user
+  sudo mysql -u root -p"$DB_PASS" <<EOF
 CREATE DATABASE $DB_NAME;
 CREATE USER '$DB_USER'@'localhost' IDENTIFIED BY '$DB_PASS';
 GRANT ALL PRIVILEGES ON $DB_NAME.* TO '$DB_USER'@'localhost';
 FLUSH PRIVILEGES;
 EOF
 
-# Check for errors
-if [ $? -ne 0 ]; then
-  echo "Error creating database and user"
-  exit 1
-else
-  echo "Database and user created successfully."
+  # Check for errors
+  if [ $? -ne 0 ]; then
+    echo "Error creating database and user"
+    exit 1
+  else
+    echo "Database and user created successfully."
+  fi
 fi
 
 # Restart MariaDB service
 sudo systemctl restart mariadb
-
