@@ -27,3 +27,8 @@ CRON_SCHEDULE="0 0 * * 0"
 (crontab -l 2>/dev/null; echo "$CRON_SCHEDULE $SCRIPT_FILE") | crontab -
 
 echo "Cron job added to run $SCRIPT_FILE every Sunday at 00:00 UTC+5:30."
+
+#Cleaning unwanted Packages
+
+sudo apt clean
+echo "Cleaning Packages!!" 
