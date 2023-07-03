@@ -33,18 +33,33 @@ sudo tee /var/www/html/index.html >/dev/null <<EOF
 </html>
 EOF
 
-# Create a new Nginx server block configuration file for the domain
-sudo tee /etc/nginx/sites-available/$domain >/dev/null <<EOF
+# Create nginx server block file
+cat > /etc/nginx/sites-available/$DOMAIN << EOF
 server {
-  listen 80;
-  listen [::]:80;
-
-  server_name $domain;
-
-  location / {
-    try_files \$uri \$uri/ =404;
-  }
+        listen 80 ;
+        listen [::]:80 ;
+        server_name $DOMAIN ;
+        root /var/www/$DOMAIN ;
+        index index.html index.htm index.nginx-debian.html ;
+        location / {
+                try_files \$uri \$uri/ =404 ;
+        }
 }
+EOF
+
+# Create default html file for server block
+mkdir -p /var/www/$DOMAIN
+cat > /var/www/$DOMAIN/index.html << EOF
+<html>
+<head>
+  <title>Welcome to $DOMAIN!</title>
+  <title>Welcome to $domain!</title>
+</head>
+<body>
+  <h1>Success! The $DOMAIN server block is working!</h1>
+  <h1>Success! The $domain server block is working!</h1>
+</body>
+</html>
 EOF
 
 # Enable the new server block configuration if not already enabled
