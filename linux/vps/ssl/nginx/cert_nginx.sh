@@ -21,17 +21,6 @@ else
   exit 1
 fi
 
-# Create a default Nginx page
-sudo tee /var/www/html/index.html >/dev/null <<EOF
-<html>
-<head>
-  <title>Welcome to $domain!</title>
-</head>
-<body>
-  <h1>Success! The $domain server block is working!</h1>
-</body>
-</html>
-EOF
 
 # Create nginx server block file
 cat > /etc/nginx/sites-available/$DOMAIN << EOF
