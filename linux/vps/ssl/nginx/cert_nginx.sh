@@ -1,8 +1,7 @@
 #!/bin/bash
 
 # Get domain name from command line argument or prompt
-if [ -z "$1" ]
-then
+if [ -z "$1" ]; then
   read -p "Enter domain name: " domain
 else
   domain=$1
@@ -21,8 +20,24 @@ else
   exit 1
 fi
 
-# Create a default Nginx page
-sudo tee /var/www/html/index.html >/dev/null <<EOF
+# Create nginx server block file
+cat > /etc/nginx/sites-available/$domain << EOF
+server {
+  listen 80;
+  listen [::]:80;
+  server_name $domain;
+  root /var/www/$domain;
+  index index.html index.htm index.nginx-debian.html;
+  location / {
+    try_files \$uri \$uri/ =404;
+  }
+}
+EOF
+
+# Create default html file for server block if it doesn't exist
+if [ ! -f /var/www/$domain/index.html ]; then
+  mkdir -p /var/www/$domain
+  cat > /var/www/$domain/index.html << EOF
 <html>
 <head>
   <title>Welcome to $domain!</title>
@@ -32,24 +47,10 @@ sudo tee /var/www/html/index.html >/dev/null <<EOF
 </body>
 </html>
 EOF
-
-# Create a new Nginx server block configuration file for the domain
-sudo tee /etc/nginx/sites-available/$domain >/dev/null <<EOF
-server {
-  listen 80;
-  listen [::]:80;
-
-  server_name $domain;
-
-  location / {
-    try_files \$uri \$uri/ =404;
-  }
-}
-EOF
+fi
 
 # Enable the new server block configuration if not already enabled
-if [ ! -f /etc/nginx/sites-enabled/$domain ]
-then
+if [ ! -f /etc/nginx/sites-enabled/$domain ]; then
   sudo ln -s /etc/nginx/sites-available/$domain /etc/nginx/sites-enabled/
 fi
 
@@ -57,14 +58,12 @@ fi
 sudo nginx -t
 
 # If the configuration test is successful, reload Nginx
-if [ $? -eq 0 ]
-then
+if [ $? -eq 0 ]; then
   sudo systemctl reload nginx
 fi
 
 # Obtain SSL certificate from Let's Encrypt
-if [ -z "$2" ]
-then
+if [ -z "$2" ]; then
   sudo certbot --nginx -d $domain
 else
   sudo certbot --nginx -d $domain --register-unsafely-without-email
