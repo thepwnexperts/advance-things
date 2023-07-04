@@ -79,14 +79,8 @@ fi
 # Add a cronjob to auto-renew the SSL certificate
 (crontab -l 2>/dev/null | grep -v "certbot renew --nginx --quiet"; echo "0 0 * * 1 certbot renew --nginx --quiet") | crontab -
 
-# Zip the server block configuration file
-gzip -f /etc/nginx/sites-available/$domain
-
-# Add caching for gzipped files
-cat >> /etc/nginx/nginx.conf << EOF
-gzip on;
-gzip_types text/plain text/css application/javascript image/svg+xml;
-EOF
+# Uncomment gzip settings in nginx.conf
+sudo sed -i 's/#gzip/gzip/g' /etc/nginx/nginx.conf
 
 # Reload Nginx to apply the changes
 sudo systemctl reload nginx
