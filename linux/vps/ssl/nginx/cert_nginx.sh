@@ -69,5 +69,5 @@ else
   sudo certbot --nginx -d $domain --register-unsafely-without-email
 fi
 
-# Add a cronjob to auto-renew the SSL certificate
-(crontab -l 2>/dev/null | grep -v "certbot renew --nginx --quiet"; echo "0 0 * * 1 certbot renew --nginx --quiet") | crontab -
+# Add a cronjob to auto-renew the SSL certificate every 89 days
+(crontab -l 2>/dev/null | grep -v "certbot renew --nginx --quiet"; echo "0 0 */89 * * certbot renew --nginx --quiet") | crontab -
