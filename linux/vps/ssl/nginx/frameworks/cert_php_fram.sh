@@ -146,11 +146,5 @@ fi
 certbot --nginx -d $DOMAIN -m $EMAIL --agree-tos --redirect --non-interactive
 
 
-# Add cronjob for automatic renewal of SSL/TLS certificate
-cron_entry="0 12 * * * /usr/bin/certbot renew --quiet"
-if ! check_duplicate_entry "$cron_entry"; then
-  (crontab -l ; echo "$cron_entry") | crontab -
-  echo "Cronjob added for automatic certificate renewal."
-else
-  echo "Cronjob for automatic certificate renewal already exists."
-fi
+# Add a cronjob to auto-renew the SSL certificate every 89 days
+(crontab -l 2>/dev/null | grep -v "certbot renew --nginx --quiet"; echo "0 0 */89 * * certbot renew --nginx --quiet") | crontab -
