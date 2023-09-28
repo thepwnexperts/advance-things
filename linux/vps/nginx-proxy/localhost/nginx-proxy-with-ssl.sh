@@ -20,42 +20,6 @@ else
   exit 1
 fi
 
-# Function to renew all certificates
-renew_all_certificates() {
-  sudo certbot renew --quiet
-}
-
-# Attempt to renew all certificates
-renew_all_certificates
-
-# Check if any certificates are still not renewed
-if [ $? -eq 1 ]; then
-  echo "Certificate renewal failed. Checking and fixing renewal configurations..."
-
-  # Get the list of domains from renewal configuration files
-  domains=($(grep "^\s*domains =" /etc/letsencrypt/renewal/*.conf | cut -d "=" -f 2 | tr -d " \t,\""))
-
-  # Loop through the list of domains and check/fix renewal configurations
-  for domain in "${domains[@]}"; do
-    echo "Checking and fixing renewal configuration for $domain..."
-    sudo certbot certonly --nginx -d $domain
-  done
-
-  # Attempt to renew certificates again after fixing configurations
-  renew_all_certificates
-
-  # Check if renewal is still failing
-  if [ $? -eq 1 ]; then
-    echo "Certificate renewal is still failing after troubleshooting. Please investigate the issue."
-  else
-    echo "Certificate renewal is successful after troubleshooting."
-  fi
-else
-  echo "Certificate renewal is successful."
-fi
-
-
-
 # Function to add a new subdomain
 function add_subdomain() {
     echo "Adding a new subdomain..."
@@ -92,8 +56,9 @@ EOF
     # Reload Nginx to apply changes
     systemctl reload nginx
 
-   # Finally, add a cron job to auto-renew the SSL certificate every 89 days
-   (crontab -l 2>/dev/null | grep -v "certbot renew --nginx --quiet"; echo "0 0 */89 * * certbot renew --nginx --quiet") | crontab -
+    # Obtain SSL certificate using Certbot
+    certbot --nginx -d ${domain}
+
     echo "Subdomain ${domain} added successfully!"
 }
 
