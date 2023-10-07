@@ -64,11 +64,6 @@ server {
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
     }
-
-    location ~ /.well-known/acme-challenge {
-        allow all;
-        root /var/www/html;
-    }
 EOF
 
     # Add HSTS support if enabled
@@ -107,17 +102,7 @@ EOF
     echo "Subdomain ${domain} added successfully!"
 }
 
-    # Create symbolic link to enable subdomain
-    ln -s "${config_file}" "/etc/nginx/sites-enabled/${domain}"
 
-    # Reload Nginx to apply changes
-    systemctl reload nginx
-
-    # Obtain SSL certificate using Certbot
-    certbot --nginx -d ${domain}
-
-    echo "Subdomain ${domain} added successfully!"
-}
 
 
 # Function to update an existing subdomain
@@ -195,4 +180,3 @@ do
             ;;
     esac
 done
-
