@@ -64,11 +64,6 @@ server {
         proxy_set_header X-Real-IP \$remote_addr;
         proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
     }
-
-    location ~ /.well-known/acme-challenge {
-        allow all;
-        root /var/www/html;
-    }
 EOF
 
     # Add HSTS support if enabled
