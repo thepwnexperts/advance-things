@@ -1,5 +1,27 @@
 #!/bin/bash
 
+# Initialize variables for HSTS and HTTP/2
+enable_hsts=0
+enable_http2=0
+
+# Parse command-line options
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        --hsts)
+            enable_hsts=1
+            shift
+            ;;
+        --http2)
+            enable_http2=1
+            shift
+            ;;
+        *)
+            echo "Usage: $0 [--hsts] [--http2]"
+            exit 1
+            ;;
+    esac
+done
+
 # Get domain name from command line argument or prompt
 if [ -z "$1" ]; then
   read -p "Enter domain name: " domain
@@ -47,6 +69,29 @@ server {
         allow all;
         root /var/www/html;
     }
+EOF
+
+    # Add HSTS support if enabled
+    if [ $enable_hsts -eq 1 ]; then
+        cat >> "${config_file}" << EOF
+    # Enable HSTS (HTTP Strict Transport Security)
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload";
+EOF
+    fi
+
+    # Add HTTP/2 support if enabled
+    if [ $enable_http2 -eq 1 ]; then
+        cat >> "${config_file}" << EOF
+    # Enable HTTP/2 support
+    listen 443 ssl http2;
+    ssl_certificate /etc/letsencrypt/live/${domain}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/${domain}/privkey.pem;
+    include /etc/letsencrypt/options-ssl-nginx.conf;
+    ssl_dhparam /etc/letsencrypt/ssl-dhparams.pem;
+EOF
+    fi
+
+    cat >> "${config_file}" << EOF
 }
 EOF
 
@@ -61,6 +106,8 @@ EOF
 
     echo "Subdomain ${domain} added successfully!"
 }
+
+
 
 
 # Function to update an existing subdomain
