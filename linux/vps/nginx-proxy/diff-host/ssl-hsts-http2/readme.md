@@ -44,9 +44,15 @@ Follow these steps to use the script:
 
    - **Quit**: Exits the script.
 
+
 5. Follow the on-screen prompts to complete the desired action.
 
 ## Options
+Suppose you want to add a new subdomain called `blog.example.com` that points to an application running on port `8080` on a proxy server with IP address `192.168.1.100`. You can use the script as follows:
+
+```bash
+./nginx-subdomain.sh --hsts --http2 -d blog.example.com -p 8080 -ph 192.168.1.100
+```
 
 The script supports the following command-line options:
 
