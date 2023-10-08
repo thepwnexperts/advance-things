@@ -1,8 +1,11 @@
 #!/bin/bash
 
-# Initialize variables for HSTS and HTTP/2
+# Initialize variables for HSTS, HTTP/2, domain, port, and proxy_host
 enable_hsts=0
 enable_http2=0
+domain=""
+port=""
+proxy_host=""
 
 # Parse command-line options
 while [[ $# -gt 0 ]]; do
@@ -15,18 +18,29 @@ while [[ $# -gt 0 ]]; do
             enable_http2=1
             shift
             ;;
+        -d|--domain)
+            domain="$2"
+            shift 2
+            ;;
+        -p|--port)
+            port="$2"
+            shift 2
+            ;;
+        -ph|--proxy-host)
+            proxy_host="$2"
+            shift 2
+            ;;
         *)
-            echo "Usage: $0 [--hsts] [--http2]"
+            echo "Usage: $0 [--hsts] [--http2] [-d|--domain domain_name] [-p|--port port_number] [-ph|--proxy-host proxy_ip]"
             exit 1
             ;;
     esac
 done
 
-# Get domain name from command line argument or prompt
-if [ -z "$1" ]; then
+
+# If domain is not provided via parameters, prompt the user
+if [ -z "$domain" ]; then
   read -p "Enter domain name: " domain
-else
-  domain=$1
 fi
 
 # Install Nginx and Certbot
@@ -46,9 +60,15 @@ fi
 function add_subdomain() {
     echo "Adding a new subdomain..."
 
-    # Ask for domain and application port number
-    read -p "Enter domain name (e.g. example.com): " domain
-    read -p "Enter application port number (e.g. 3000): " port
+# If proxy_host is not provided via parameters, prompt the user
+#if [ -z "$proxy_host" ]; then
+#  read -p "Enter proxy server host IP (e.g. 192.168.1.100): " proxy_host
+#fi
+
+# If port is not provided via parameters, prompt the user
+if [ -z "$port" ]; then
+  read -p "Enter application port number (e.g. 3000): " port
+fi
 
     # Create Nginx configuration file for subdomain
     config_file="/etc/nginx/sites-available/${domain}"
