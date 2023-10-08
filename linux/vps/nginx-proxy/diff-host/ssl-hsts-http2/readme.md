@@ -70,8 +70,4 @@ This script is provided under the GNU General Public License, version 3.0 (GPL-3
 
 ---
 
-**Author**: Your Name  
-**Contact**: your.email@example.com
-```
 
-Replace `"your_username/nginx-subdomain-management.git"` with the actual URL of your script repository, and make sure to fill in the author's name and contact email. This README should provide a clear overview of your script and its updated GPL 3.0 license.
