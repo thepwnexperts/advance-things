@@ -6,6 +6,7 @@ enable_http2=0
 domain=""
 port=""
 proxy_host=""
+add_domain=0  # Initialize the flag for adding a domain
 
 # Parse command-line options
 while [[ $# -gt 0 ]]; do
@@ -30,8 +31,12 @@ while [[ $# -gt 0 ]]; do
             proxy_host="$2"
             shift 2
             ;;
+        --add-d)  # New flag for adding a domain
+            add_domain=1
+            shift
+            ;;
         *)
-            echo "Usage: $0 [--hsts] [--http2] [-d|--domain domain_name] [-p|--port port_number] [-ph|--proxy-host proxy_ip]"
+            echo "Usage: $0 [--hsts] [--http2] [-d|--domain domain_name] [-p|--port port_number] [-ph|--proxy-host proxy_ip] [--add-d]"
             exit 1
             ;;
     esac
@@ -184,7 +189,11 @@ select opt in "${options[@]}"
 do
     case $opt in
         "Add subdomain")
-            add_subdomain
+            if [ $add_domain -eq 1 ]; then
+                add_subdomain
+            else
+                echo "Invalid option! To add a domain, use the --add-d flag."
+            fi
             ;;
         "Update subdomain")
             update_subdomain
