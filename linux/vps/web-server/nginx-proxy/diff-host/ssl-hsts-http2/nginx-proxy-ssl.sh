@@ -79,12 +79,12 @@ if [ "$add_domain" -eq 1 ] || [ "$remove_domain" -eq 1 ] || [ "$update_domain" -
 else
     # Ask the user what they want to do if none of the domain-related flags are used
     echo "What do you want to do?"
-    options=("Add subdomain" "Update subdomain" "Remove subdomain" "Quit")
+    options=("Add domain" "Update subdomain" "Remove subdomain" "Quit")
     select opt in "${options[@]}"
     do
         case $opt in
             "Add subdomain")
-                add_subdomain
+                add_domain
                 ;;
             "Update subdomain")
                 update_subdomain
