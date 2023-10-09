@@ -1,79 +1,53 @@
-```markdown
-# Nginx Subdomain Management Script
+# Nginx Proxy with SSL Management Script
 
-This Bash script is designed to simplify the process of managing subdomains for Nginx web server configurations. It provides options to add, update, or remove subdomains, and automates the installation of Nginx and Certbot for SSL certificate management.
+## Overview
+This Bash script simplifies the setup and management of Nginx with SSL (via Certbot) for web domains. It provides options for enabling HSTS, HTTP/2, specifying the domain, port, and proxy host, and managing subdomains. Whether you want to add, update, or remove a subdomain, this script automates the process.
 
-## Prerequisites
-
-Before using this script, make sure you have the following prerequisites:
-
-- A Linux-based system (tested with Ubuntu, Fedora, and CentOS)
-- sudo privileges for executing certain commands
-- A domain name that you want to configure subdomains for
+## Features
+- Easy setup and configuration of Nginx with SSL.
+- Enable or disable HSTS and HTTP/2.
+- Manage subdomains with ease.
+- Support for multiple package managers (apt-get, dnf, yum).
 
 ## Usage
 
-Follow these steps to use the script:
+### Running the Script
 
-1. Clone the repository or download the script to your server:
-
+1. Clone this repository to your local machine.
    ```bash
-   git clone https://github.com/your_username/nginx-subdomain-management.git
-   cd nginx-subdomain-management
+   wget https://raw.githubusercontent.com/thepwnexperts/advance-things/main/linux/vps/web-server/nginx-proxy/diff-host/ssl-hsts-http2/nginx-proxy-ssl.sh
    ```
 
-2. Make the script executable:
-
+2. Make the script executable.
    ```bash
    chmod +x nginx-proxy-ssl.sh
    ```
 
-3. Run the script:
+3. Run the script with appropriate options. Here is an example:
 
-   ```bash
-   ./nginx-proxy-ssl.sh
-   ```
+   - **Add a Subdomain for `example.com` with proxy host `localhost` on port `6001`:**
+     ```bash
+     ./nginx-proxy-ssl.sh --add_domain -d example.com -ph localhost -p 6001
+     ```
 
-4. You will be presented with a menu with the following options:
+5. Follow the on-screen prompts and instructions to complete the configuration.
 
-   - **Add subdomain**: Allows you to add a new subdomain to your Nginx configuration. You will be prompted to specify the proxy server host IP and application port number.
+## Example
 
-   - **Update subdomain**: Lets you update an existing subdomain by modifying the proxy_pass directive to point to a different port.
-
-   - **Remove subdomain**: Allows you to remove an existing subdomain configuration.
-
-   - **Quit**: Exits the script.
-
-
-5. Follow the on-screen prompts to complete the desired action.
-
-## Options
-Suppose you want to add a new subdomain called `blog.example.com` that points to an application running on port `8080` on a proxy server with IP address `192.168.1.100`. You can use the script as follows:
+Let's say you want to add a subdomain for `example.com` with a proxy host set to `localhost` on port `6001`. You can use the following command:
 
 ```bash
-./nginx-proxy-ssl.sh --hsts --http2 -d blog.example.com -p 8080 -ph 192.168.1.100
+./nginx-proxy-ssl.sh --add_domain -d example.com -ph localhost -p 6001
 ```
 
-The script supports the following command-line options:
-
-- `--hsts`: Enable HSTS (HTTP Strict Transport Security).
-- `--http2`: Enable HTTP/2 support.
-- `-d` or `--domain`: Specify the domain name.
-- `-p` or `--port`: Specify the port number for the application.
-- `-ph` or `--proxy-host`: Specify the proxy server host IP.
-
-## Notes
-
-- If you didn't provide the domain and other parameters via command-line options, you will be prompted to enter them during execution.
-
-- The script will automatically install Nginx and Certbot if they are not already installed. If you prefer manual installation, follow the instructions provided in the script.
-
-- The SSL certificate for the domain will be obtained using Certbot.
+This command will run the script, configuring Nginx with SSL and a proxy for the specified subdomain and settings.
 
 ## License
+This project is licensed under the GNU General Public License v3.0. See the [LICENSE](LICENSE) file for details.
 
-This script is provided under the GNU General Public License, version 3.0 (GPL-3.0). You are free to use, modify, and distribute it under the terms of this license.
+## Acknowledgments
+Special thanks to the open-source community for their contributions and support.
 
----
+Feel free to contribute, report issues, or provide feedback!
 
-
+```
