@@ -1,4 +1,5 @@
 #!/bin/bash
+https://raw.githubusercontent.com/thepwnexperts/advance-things/main/linux/vps/web-server/nginx-proxy/diff-host/ssl-hsts-http2/domain_and_ssl_op.sh
 source domain_and_ssl_op.sh
 
 # Initialize variables for HSTS, HTTP/2, domain, port, and proxy_host
@@ -70,7 +71,7 @@ fi
 if [ "$add_domain" -eq 1 ] || [ "$remove_domain" -eq 1 ] || [ "$update_domain" -eq 1 ]; then
     # Do not ask for user input when one of the domain-related flags is used
     if [ "$add_domain" -eq 1 ]; then
-        add_subdomain
+        add_domain
     elif [ "$remove_domain" -eq 1 ]; then
         update_subdomain
     elif [ "$update_domain" -eq 1 ]; then
