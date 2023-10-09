@@ -1,4 +1,5 @@
 #!/bin/bash
+wget https://raw.githubusercontent.com/thepwnexperts/advance-things/main/linux/vps/web-server/nginx-proxy/diff-host/ssl-hsts-http2/domain_and_ssl_op.sh
 source domain_and_ssl_op.sh
 
 # Initialize variables for HSTS, HTTP/2, domain, port, and proxy_host
