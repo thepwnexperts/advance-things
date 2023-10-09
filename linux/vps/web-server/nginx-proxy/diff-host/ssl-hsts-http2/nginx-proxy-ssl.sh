@@ -36,7 +36,7 @@ while [[ $# -gt 0 ]]; do
             shift 2
             ;;
         --add_domain)  # New flag for adding a domain
-            add_subdomain=1
+            add_domain=1
             shift
             ;;
         *)
