@@ -1,5 +1,4 @@
 #!/bin/bash
-wget https://raw.githubusercontent.com/thepwnexperts/advance-things/main/linux/vps/web-server/nginx-proxy/diff-host/ssl-hsts-http2/domain_and_ssl_op.sh
 source domain_and_ssl_op.sh
 
 # Initialize variables for HSTS, HTTP/2, domain, port, and proxy_host
@@ -8,7 +7,10 @@ enable_http2=0
 domain=""
 port=""
 proxy_host=""
-add_domain=0  # Initialize the flag for adding a domain
+add_domain=0
+remove_domain=0
+update_domain=0
+
 
 # Parse command-line options
 while [[ $# -gt 0 ]]; do
@@ -70,32 +72,32 @@ if [ "$add_domain" -eq 1 ] || [ "$remove_domain" -eq 1 ] || [ "$update_domain" -
     if [ "$add_domain" -eq 1 ]; then
         add_subdomain
     elif [ "$remove_domain" -eq 1 ]; then
-       update_subdomain
+        update_subdomain
     elif [ "$update_domain" -eq 1 ]; then
         remove_subdomain
     fi
 else
     # Ask the user what they want to do if none of the domain-related flags are used
     echo "What do you want to do?"
-echo "What do you want to do?"
-options=("Add subdomain" "Update subdomain" "Remove subdomain" "Quit")
-select opt in "${options[@]}"
-do
-    case $opt in
-        "Add subdomain")
+    options=("Add subdomain" "Update subdomain" "Remove subdomain" "Quit")
+    select opt in "${options[@]}"
+    do
+        case $opt in
+            "Add subdomain")
                 add_subdomain
-            ;;
-        "Update subdomain")
-            update_subdomain
-            ;;
-        "Remove subdomain")
-            remove_subdomain
-            ;;
-        "Quit")
-            break
-            ;;
-        *)
-            echo "Invalid option!"
-            ;;
-    esac
-done
+                ;;
+            "Update subdomain")
+                update_subdomain
+                ;;
+            "Remove subdomain")
+                remove_subdomain
+                ;;
+            "Quit")
+                break
+                ;;
+            *)
+                echo "Invalid option!"
+                ;;
+        esac
+    done
+fi
